@@ -1,0 +1,33 @@
+---
+- name: Instalation of repository on Nagios
+  hosts: localhost
+  connection: ssh
+  tasks:
+
+    - name: Creating repository for ncpa on Debian
+      when: ansible_distribution == "Debian"
+      get_url:
+        url: https://assets.nagios.com/downloads/ncpa/ncpa-latest.d9.amd64.deb
+        dest: /root/evolvedevops.com
+
+    - name: Installation ncpa on Debian
+      when: ansible_distribution == "Debian"
+      apt:
+        deb: /root/evolvedevops.com/ncpa-latest.d9.amd64.deb
+
+
+    - name: Create configuration file
+      when: ansible_distribution == "Debian"
+      lineinfile:
+        dest: /usr/local/ncpa/etc/ncpa.cfg
+        regexp: '^community_string = token' 
+        line:  'community_string = zX8fLY$gBUYwc6G' 
+
+    - name: Restart ncps 
+      when: ansible_distribution == "Debian"
+      systemd:
+        name: ncpa_listener
+        state: restarted
+        enabled: yes
+
+        
